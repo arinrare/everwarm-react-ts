@@ -146,7 +146,7 @@ button:hover {
 	vertical-align: top;
 }
 			
-.formcontainer { 
+.formcontainer, .confirmcontainer { 
     width: 450px;
     display: flex;
     flex-direction: column;
@@ -201,22 +201,7 @@ button:hover {
 	zoom: 1;
 }
 				
-/* Confirm and summary Form */
-.confirmcontainer {
-    width: 100%;
-	display: flex;
-    flex-direction: column;
-    justify-content: right;
-}
-					
-.formfield1 {
-    display: inline-block;
-	font: bold 20px Arial;
-	text-align: right;
-	width: 35%;
-	margin: 5px;
-}
-				
+/* Confirm and summary Form */						
 .formfield2 {	
     display: inline-block;
 	text-align: left;
@@ -229,6 +214,7 @@ button:hover {
     width: 162px;
 	height: 41px;
 	background-image: url(../../images/cancel.jpg);
+	margin-right: 5px;
 }
 
 .cancelbutton:hover { 

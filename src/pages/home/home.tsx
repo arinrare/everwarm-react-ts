@@ -30,6 +30,9 @@ const Home = () => {
 
     const [disableProcessButton, setDisableProcessButton] = useState(false);
     const [disableSummaryButton, setDisableSummaryButton] = useState(false);
+
+    const [gst] = useState(10);
+    const [storedDailySummary, setStoredDailySummary] = useState([0, 0, 0, 0, 0, 0]);
    
     React.useEffect(() => {
         document.title = "Everwarm Fuel Merchants - Home";
@@ -43,17 +46,100 @@ const Home = () => {
     }
 
     function processOrder() {
+        let calcDistance = parseFloat(distance.toString());
+        outputOrder();
+        
+        let dailySummary = [...storedDailySummary];
+        dailySummary[0]++;
+        dailySummary[1] = dailySummary[1] + parseInt(number);
+        if (isNaN(calcDistance) === false && calcDistance >= 0) {
+            dailySummary[2] = dailySummary[2] + calcDistance;
+        }
+        else {
+            calcDistance = 0;
+            dailySummary[2] = dailySummary[2] + calcDistance;
+        }
+        dailySummary[3] = dailySummary[3] + parseFloat(deliveryCost());
+        dailySummary[4] = dailySummary[4] + parseFloat(calcGst());
+        dailySummary[5] = dailySummary[5] + parseFloat(totalValue());
+        setStoredDailySummary(dailySummary);
         clearForms();
     }
 
     function createSummary() {
-    
+        setConfirmHeader('Daily Summary');
+        setConfirmNameLabel('Total Orders:');
+        setConfirmName(storedDailySummary[0].toString()); // Convert the number to a string
+        setConfirmPhoneLabel('Total Bags Sold:');
+        setConfirmPhone(storedDailySummary[1].toString());
+        setConfirmAddressLabel('Total Delivery Distance:');
+        setConfirmAddress(storedDailySummary[2].toString() + ' km');
+        setConfirmNumberLabel('Total Delivery Cost:');
+        setConfirmNumber('$' + storedDailySummary[3].toString());
+        setConfirmDistanceLabel('Total GST:');
+        setConfirmDistance('$' + storedDailySummary[4].toString());
+        setDisableSummaryButton(true);
+        setDisableProcessButton(true);
+        setShowCancel(true);
+        setShowProcess(false);
     }
     
     function exitProgram() {
-    
+        window.alert('Closing!');
+        window.close();
     } 
-    
+
+    function outputOrder() {
+        if (parseFloat(confirmDistance)%1 !== 0) {
+            setConfirmDistance(parseFloat(confirmDistance).toFixed(2));
+        }
+        window.alert("*** ORDER DETAILS ***\n\n" 
+        + "NAME: " + confirmName + "\n" 
+        + "PHONE: " + confirmPhone + "\n" 
+        + "DELIVERY ADDRESS: " + confirmAddress + "\n" 
+        + "# BAGS SOLD: " + confirmNumber + "\n" 
+        + "DELIVERY DISTANCE (km): " + confirmDistance + "\n" 
+        + "TOTAL BAG COST: $" + bagTotal() + "\n" 
+        + "DELIVERY COST: $" + deliveryCost() + "\n" 
+        + "GST: $" + calcGst() + "\n" 
+        + "TOTAL ORDER VALUE: $" + totalValue());
+        
+    }
+
+    function bagTotal() {
+        var bagcost=8.8;
+        var discount=0;
+        var bags=parseInt(confirmNumber);
+        if (bags<=50)
+            discount=1;
+        else if (bags > 50 && bags <100)
+            discount=.96;
+        else
+            discount=.93;
+        var bagtotal=parseFloat(((bagcost * bags) * discount).toFixed(2));
+        return bagtotal.toFixed(2);
+    }
+
+    function deliveryCost() {
+        var distance=parseFloat(confirmDistance);
+        var delcost;
+        if (distance <= 20)
+            delcost=20;
+        else
+            delcost=30;
+        return delcost.toFixed(2);
+    }
+
+    function calcGst() {
+        const totalgst = ((parseFloat(bagTotal()) + parseFloat(deliveryCost())) * (gst/100)).toFixed(2);
+        return totalgst;
+    }
+
+    function totalValue () {
+        var total=parseFloat(bagTotal() + deliveryCost() + calcGst());
+        return total.toFixed(2).toString();
+    }
+
     function validateForm() {
         let error = '';
         if (name === null || name === '') {
@@ -101,7 +187,7 @@ const Home = () => {
         setConfirmAddress(address);
         setConfirmNumberLabel('# Bags Sold:');
         setConfirmNumber(number);
-        setConfirmDistanceLabel('Delivery Distance:');
+        setConfirmDistanceLabel('Delivery Distance (km):');
         setConfirmDistance(distance);
                 
         setDisableProcessButton(true);
@@ -218,30 +304,30 @@ const Home = () => {
                     <form name="confirm_order" method="post">
                         <div className="confirmcontainer">
                             <div>
-                                <div className="formfield1" >{confirmHeader}</div>
+                                <div className="left formfield1" >{confirmHeader}</div>
                                 <div className="formfield2"></div>
                             </div>    
                             <div>
-                                <div className="formfield1">{confirmNameLabel}</div>
+                                <div className="left formfield1">{confirmNameLabel}</div>
                                 <div className="formfield2">{confirmName}</div>
                             </div>
                             <div>    
-                                <div className="formfield1">{confirmPhoneLabel}</div>
+                                <div className="left formfield1">{confirmPhoneLabel}</div>
                                 <div className="formfield2">{confirmPhone}</div>
                             </div>    
                             <div>
-                                <div className="formfield1">{confirmAddressLabel}</div>
+                                <div className="left formfield1">{confirmAddressLabel}</div>
                                 <div className="formfield2">{confirmAddress}</div>
                             </div>
                             <div>
-                                <div className="formfield1">{confirmNumberLabel}</div>
+                                <div className="left formfield1">{confirmNumberLabel}</div>
                                 <div className="formfield2">{confirmNumber}</div>
                             </div>
                             <div>
-                                <div className="formfield1">{confirmDistanceLabel}</div>
+                                <div className="left formfield1">{confirmDistanceLabel}</div>
                                 <div className="formfield2">{confirmDistance}</div>
                             </div>
-                            <div>
+                            <div className="buttoncontainer">
                                 <button type="button" className={showCancel ? "cancelbutton showCancelButton" : "cancelbutton"} onClick={clearForms}></button>
                                 <button type="button" className={showProcess ? "processbutton showProcessButton" : "processbutton"} onClick={processOrder}></button>
                             </div>
