@@ -15,7 +15,7 @@ function App() {
   /* basename="/portfolio/everwarm-react-ts" */
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter basename="/portfolio/everwarm-react-ts">
         <Routes>
           <Route path='/' element={<Home />} />
         </Routes>
